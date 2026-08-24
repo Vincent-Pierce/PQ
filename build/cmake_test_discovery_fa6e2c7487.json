@@ -1,10 +1,10 @@
 {
-  "tests": 2,
+  "tests": 9,
   "name": "AllTests",
   "testsuites": [
     {
       "name": "Student",
-      "tests": 2,
+      "tests": 3,
       "testsuite": [
         {
           "name": "Constructor",
@@ -12,9 +12,50 @@
           "line": 5
         },
         {
-          "name": "get",
+          "name": "ConstructorNegativeValues",
           "file": "\/home\/vincent-pierce\/Documents\/PQ\/tests\/PriorityQueue_test.cpp",
           "line": 16
+        },
+        {
+          "name": "ConstructorExceedingValues",
+          "file": "\/home\/vincent-pierce\/Documents\/PQ\/tests\/PriorityQueue_test.cpp",
+          "line": 27
+        }
+      ]
+    },
+    {
+      "name": "PriorityQueue",
+      "tests": 6,
+      "testsuite": [
+        {
+          "name": "peek",
+          "file": "\/home\/vincent-pierce\/Documents\/PQ\/tests\/PriorityQueue_test.cpp",
+          "line": 38
+        },
+        {
+          "name": "insert",
+          "file": "\/home\/vincent-pierce\/Documents\/PQ\/tests\/PriorityQueue_test.cpp",
+          "line": 47
+        },
+        {
+          "name": "pop_one",
+          "file": "\/home\/vincent-pierce\/Documents\/PQ\/tests\/PriorityQueue_test.cpp",
+          "line": 60
+        },
+        {
+          "name": "print",
+          "file": "\/home\/vincent-pierce\/Documents\/PQ\/tests\/PriorityQueue_test.cpp",
+          "line": 70
+        },
+        {
+          "name": "pop_reheapifies_root",
+          "file": "\/home\/vincent-pierce\/Documents\/PQ\/tests\/PriorityQueue_test.cpp",
+          "line": 84
+        },
+        {
+          "name": "tie_breaker",
+          "file": "\/home\/vincent-pierce\/Documents\/PQ\/tests\/PriorityQueue_test.cpp",
+          "line": 101
         }
       ]
     }

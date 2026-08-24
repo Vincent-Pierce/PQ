@@ -16,15 +16,26 @@
 
 class Student {
 public:
-	// The default constructor for Student. Priority is default -1 so that PriorityQueue can distinguish uninitialized students. Delete me later not meant for usage
-	Student() : name(""), red_id(0), email(""), GPA(0.0), units_taken(0), priority(-1.0)
+	// The default constructor for Student. 
+	Student() : name(""), red_id(0), email(""), GPA(0.0), units_taken(0), priority(0)
 	{
 	}
 
 	// The parameterized constructor for Student using initializer list.
-	Student(std::string name, uint64_t red_id, std::string email, float GPA, uint8_t units_taken) : name(name), red_id(red_id), email(email), GPA(GPA), units_taken(units_taken), priority(-1.0)
+	Student(std::string name, uint64_t red_id, std::string email, float GPA, int units_taken) : name(name), red_id(red_id), email(email), GPA(GPA), units_taken(units_taken)
 	{
-		this->priority = (0.7 * units_taken) + (0.3*GPA);
+		// Boundary for GPA and units_taken. Neither can be negative. GPA max is 4.0 and units_taken max is 150.
+		if(GPA < 0.0)
+			this->GPA = 0.0;
+		else if(GPA > 4.0)
+			this->GPA = 4.0;
+		if(units_taken < 0)
+			this->units_taken = 0;
+		if(units_taken > 150)
+			this->units_taken = 150;
+
+		// calculate priority 30% gpa + 70% units_taken
+		this->priority = (0.7 * this->units_taken) + ( 0.3 * this->GPA);
 		printf("My priority is %f\n", priority);
 	}
 
@@ -63,11 +74,16 @@ public:
 		return priority;
 	}
 
+	// Print out red id and name of student
+	void print(void) const
+	{
+		printf("Name:\t%s\tRedID:\t%lu\n", name.c_str(), red_id);
+	}
 private:
 	std::string		name;
 	uint64_t		red_id;
 	std::string		email;
 	float			GPA;
-	uint8_t			units_taken;
+	int				units_taken;
 	float			priority;			// Calculated as a fraction of GPA and units_taken
 };

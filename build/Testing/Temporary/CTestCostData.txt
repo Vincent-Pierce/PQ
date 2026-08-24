@@ -1,3 +1,13 @@
-Student.Constructor 3 0.00101712
+Student.Constructor 39 7.73226e-05
 Student.get 3 0.000995592
+Student.PQinsert 1 0.00124018
+PriorityQueue.peek 34 9.13242e-05
+PriorityQueue.insert 34 0.000109574
+PriorityQueue.pop 5 0.000584267
+PriorityQueue.pop_one 28 0.0001583
+PriorityQueue.tie_breaker 20 0.000258332
+PriorityQueue.pop_reheapifies_root 20 0.000288203
+Student.ConstructorNegativeValues 5 0.000498066
+Student.ConstructorExceedingValues 3 0.00095805
+PriorityQueue.print 2 0.00280987
 ---

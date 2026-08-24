@@ -41,6 +41,14 @@ public:
 		return retVal;
 	}
 
+	void print(void) const
+	{
+		for (int i = 0; i < pq.size(); ++i)
+		{
+			printf("Name:\t%s\tRedID:\t%lu\tPriority:\t%f\n", pq[i]->getName().c_str(), pq[i]->getRedID(), pq[i]->getPriority());
+		}
+	}
+
 private:
 	std::vector<Student*> pq;
 
@@ -67,7 +75,7 @@ private:
 	}
 
 	// Swaps two given student pointers
-	void swap(Student* a, Student* b)
+	void swap(Student*& a, Student*& b)
 	{
 		Student* temp = a;
 		a = b;
@@ -96,7 +104,8 @@ private:
 		pq[0] = pq[pq.size() - 1];
 
 		pq.pop_back();
-
+		if(pq.size() == 0)
+			return;
 		// swap with min child
 		Student* curr = pq[0];
 		int index = 0;
@@ -106,14 +115,21 @@ private:
 			Student* right = getRightChild(index);
 			if (left != nullptr && left->getPriority() > curr->getPriority())
 			{
-				swap(curr, left);
+				swap(pq[index], pq[(index * 2) + 1]);
 			}
-			else if (right != nullptr && left->getPriority() > curr->getPriority())
+			else if (right != nullptr && right->getPriority() > curr->getPriority())
 			{
-				swap(curr, right);
+				swap(pq[index], pq[(index * 2) + 2]);
+			}
+			else if (left != nullptr && right != nullptr && left->getPriority() == right->getPriority())
+			{
+				// tie breaker, if left and right are equal, pop the one that was inserted first (left)
+				swap(pq[index], pq[(index * 2) + 1]);
 			}
 			else
 				break;
+			
+			++index;
 
 		}
 	}
