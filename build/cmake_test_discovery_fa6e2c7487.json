@@ -1,0 +1,22 @@
+{
+  "tests": 2,
+  "name": "AllTests",
+  "testsuites": [
+    {
+      "name": "Student",
+      "tests": 2,
+      "testsuite": [
+        {
+          "name": "Constructor",
+          "file": "\/home\/vincent-pierce\/Documents\/PQ\/tests\/PriorityQueue_test.cpp",
+          "line": 5
+        },
+        {
+          "name": "get",
+          "file": "\/home\/vincent-pierce\/Documents\/PQ\/tests\/PriorityQueue_test.cpp",
+          "line": 16
+        }
+      ]
+    }
+  ]
+}

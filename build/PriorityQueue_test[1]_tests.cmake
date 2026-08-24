@@ -1,0 +1,5 @@
+add_test([=[Student.Constructor]=]  /home/vincent-pierce/Documents/PQ/build/PriorityQueue_test [==[--gtest_filter=Student.Constructor]==] --gtest_also_run_disabled_tests)
+set_tests_properties([=[Student.Constructor]=]  PROPERTIES DEF_SOURCE_LINE /home/vincent-pierce/Documents/PQ/tests/PriorityQueue_test.cpp:5 WORKING_DIRECTORY /home/vincent-pierce/Documents/PQ/build SKIP_REGULAR_EXPRESSION [==[\[  SKIPPED \]]==])
+add_test([=[Student.get]=]  /home/vincent-pierce/Documents/PQ/build/PriorityQueue_test [==[--gtest_filter=Student.get]==] --gtest_also_run_disabled_tests)
+set_tests_properties([=[Student.get]=]  PROPERTIES DEF_SOURCE_LINE /home/vincent-pierce/Documents/PQ/tests/PriorityQueue_test.cpp:16 WORKING_DIRECTORY /home/vincent-pierce/Documents/PQ/build SKIP_REGULAR_EXPRESSION [==[\[  SKIPPED \]]==])
+set(  PriorityQueue_test_TESTS Student.Constructor Student.get)

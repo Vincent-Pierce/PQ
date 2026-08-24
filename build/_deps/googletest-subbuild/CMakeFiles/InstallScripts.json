@@ -1,0 +1,7 @@
+{
+	"InstallScripts" : 
+	[
+		"/home/vincent-pierce/Documents/PQ/build/_deps/googletest-subbuild/cmake_install.cmake"
+	],
+	"Parallel" : false
+}
