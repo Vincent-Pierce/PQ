@@ -10,7 +10,6 @@ TEST(Student, Constructor)
     EXPECT_EQ("amy@gmail.com", s1->getEmail());
     EXPECT_EQ(4.0, s1->getGPA());
     EXPECT_EQ(10, s1->getUnitsTaken());
-    EXPECT_FLOAT_EQ(8.2, s1->getPriority());
 }
 
 TEST(Student, ConstructorNegativeValues)
@@ -21,7 +20,6 @@ TEST(Student, ConstructorNegativeValues)
     EXPECT_EQ("amy@gmail.com", s1->getEmail());
     EXPECT_FLOAT_EQ(0.0, s1->getGPA());
     EXPECT_EQ(0, s1->getUnitsTaken());
-    EXPECT_FLOAT_EQ(0.0, s1->getPriority());
 }
 
 TEST(Student, ConstructorExceedingValues)
@@ -32,7 +30,6 @@ TEST(Student, ConstructorExceedingValues)
     EXPECT_EQ("amy@gmail.com", s1->getEmail());
     EXPECT_EQ(4.0, s1->getGPA());
     EXPECT_EQ(150, s1->getUnitsTaken());
-    EXPECT_FLOAT_EQ(106.2, s1->getPriority());
 }
 
 TEST(PriorityQueue, peek)

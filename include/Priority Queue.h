@@ -26,7 +26,7 @@ public:
 
 	Student* peek(void)
 	{
-		printf("PEEKING\nname:\t%s\t\tpriority:\t%f\n", pq[0]->getName().c_str(), pq[0]->getPriority());
+		printf("PEEKING\nname:\t%s\t\tpriority:\t%f\n", pq[0]->getName().c_str(), getPriority(pq[0]));
 		return pq[0];
 	}
 
@@ -45,12 +45,18 @@ public:
 	{
 		for (int i = 0; i < pq.size(); ++i)
 		{
-			printf("Name:\t%s\tRedID:\t%lu\tPriority:\t%f\n", pq[i]->getName().c_str(), pq[i]->getRedID(), pq[i]->getPriority());
+			printf("Name:\t%s\tRedID:\t%lu\tPriority:\t%f\n", pq[i]->getName().c_str(), pq[i]->getRedID(), getPriority(pq[i]));
 		}
 	}
 
 private:
 	std::vector<Student*> pq;
+
+	// Calculates the priority of a student as 70% units taken and 30% GPA
+	static float getPriority(Student* student)
+	{
+		return (0.7 * student->getUnitsTaken()) + (0.3 * student->getGPA());
+	}
 
 	// Returns the parent node for given index in pq
 	Student* getParent(int index)
@@ -86,7 +92,7 @@ private:
 	void bubbleUp(Student* curr, int curr_index)
 	{
 		Student* parent = getParent(curr_index);
-		while (curr_index > 0 && curr->getPriority() > parent->getPriority())
+		while (curr_index > 0 && getPriority(curr) > getPriority(parent))
 		{
 			Student* temp = curr;
 			pq[curr_index] = parent;
@@ -113,15 +119,15 @@ private:
 		{
 			Student* left = getLeftChild(index);
 			Student* right = getRightChild(index);
-			if (left != nullptr && left->getPriority() > curr->getPriority())
+			if (left != nullptr && getPriority(left) > getPriority(curr))
 			{
 				swap(pq[index], pq[(index * 2) + 1]);
 			}
-			else if (right != nullptr && right->getPriority() > curr->getPriority())
+			else if (right != nullptr && getPriority(right) > getPriority(curr))
 			{
 				swap(pq[index], pq[(index * 2) + 2]);
 			}
-			else if (left != nullptr && right != nullptr && left->getPriority() == right->getPriority())
+			else if (left != nullptr && right != nullptr && getPriority(left) == getPriority(right))
 			{
 				// tie breaker, if left and right are equal, pop the one that was inserted first (left)
 				swap(pq[index], pq[(index * 2) + 1]);
