@@ -115,3 +115,51 @@ TEST(PriorityQueue, tie_breaker)
     EXPECT_EQ(pq->pop(), s2);
 
 }
+
+TEST(PriorityQueue, pop_empty)
+{
+    PriorityQueue* pq = new PriorityQueue();
+    EXPECT_EQ(pq->pop(), nullptr);
+}
+
+TEST(PriorityQueue, peek_empty)
+{
+    PriorityQueue* pq = new PriorityQueue();
+    EXPECT_EQ(pq->peek(), nullptr);
+}
+
+TEST(PriorityQueue, pop_all)
+{
+    Student* s1       = new Student("Amy", 0, "amy@gmail.com", 4.0, 10);
+    Student* s2       = new Student("Bob", 0, "bob@gmail.com", 3.0, 0);
+    Student* s3       = new Student("Charlie", 0, "charlie@gmail.com", 4.0, 100);
+    Student* s4       = new Student("David", 0, "david@gmail.com", 4.0, 90);
+    PriorityQueue* pq = new PriorityQueue();
+
+    pq->insert(s1);
+    pq->insert(s2);
+    pq->insert(s3);
+    pq->insert(s4);
+
+    EXPECT_EQ(pq->pop(), s3);
+    EXPECT_EQ(pq->pop(), s4);
+    EXPECT_EQ(pq->pop(), s1);
+    EXPECT_EQ(pq->pop(), s2);
+    EXPECT_EQ(pq->pop(), nullptr);
+}
+
+TEST(PriorityQueue, StressTest)
+{
+    PriorityQueue* pq = new PriorityQueue();
+    for (int i = 0; i < 10000; ++i)
+    {
+        Student* s = new Student("Student" + std::to_string(i), i, "student" + std::to_string(i) + "@gmail.com", (float)(i % 5), i % 150);
+        pq->insert(s);
+    }
+
+    for (int i = 0; i < 10000; ++i)
+    {
+        Student* s = pq->pop();
+        EXPECT_NE(s, nullptr);
+    }
+}

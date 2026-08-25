@@ -1,5 +1,0 @@
-if(EXISTS "/home/vincent-pierce/Documents/PQ/build/PriorityQueue_test[1]_tests.cmake")
-  include("/home/vincent-pierce/Documents/PQ/build/PriorityQueue_test[1]_tests.cmake")
-else()
-  add_test(PriorityQueue_test_NOT_BUILT PriorityQueue_test_NOT_BUILT)
-endif()

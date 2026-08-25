@@ -26,8 +26,13 @@ public:
 
 	Student* peek(void)
 	{
-		printf("PEEKING\nname:\t%s\t\tpriority:\t%f\n", pq[0]->getName().c_str(), getPriority(pq[0]));
-		return pq[0];
+		if(pq.empty())
+			return nullptr;
+		else
+		{
+			printf("PEEKING\nname:\t%s\t\tpriority:\t%f\n", pq[0]->getName().c_str(), getPriority(pq[0]));
+			return pq[0];
+		}
 	}
 
 	Student* pop(void)
