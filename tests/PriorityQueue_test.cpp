@@ -129,3 +129,24 @@ TEST(PriorityQueue, StressTest)
         current = next;
     }
 }
+
+TEST(PriorityQueue, CopyConstructor)
+{
+    Student s1  = Student("Amy", 0, "amy@gmail.com", 4.0, 10);
+    PriorityQueue pq = PriorityQueue();
+    pq.enqueue(s1);
+
+    PriorityQueue pq2 = pq; // Test copy constructor
+    EXPECT_EQ(pq2.front()->getName(), "Amy");
+}
+
+TEST(PriorityQueue, CopyAssignmentOperator)
+{
+    Student s1  = Student("Amy", 0, "amy@gmail.com", 4.0, 10);
+    PriorityQueue pq = PriorityQueue();
+    pq.enqueue(s1);
+
+    PriorityQueue pq2 = PriorityQueue();
+    pq2 = pq; // Test copy assignment operator
+    EXPECT_EQ(pq2.front()->getName(), "Amy");
+}
