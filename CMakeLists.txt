@@ -17,6 +17,16 @@ FetchContent_MakeAvailable(googletest)
 enable_testing()
 
 add_executable(
+    PriorityQueue_main
+    src/main.cpp
+)
+
+target_include_directories(
+    PriorityQueue_main
+    PRIVATE include
+)
+
+add_executable(
     PriorityQueue_test
     tests/PriorityQueue_test.cpp
 )

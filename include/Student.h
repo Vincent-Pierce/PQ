@@ -9,6 +9,7 @@
 /* Standard Libs *******************************************************************************************/
 #include <string>
 #include <stdint.h>
+#include <stdexcept>
 #include "math.h"
 
 
@@ -22,17 +23,17 @@ public:
 	}
 
 	// The parameterized constructor for Student using initializer list.
-	Student(std::string name, uint64_t red_id, std::string email, float GPA, int units_taken) : name(name), red_id(red_id), email(email), GPA(GPA), units_taken(units_taken)
+	Student(std::string name, uint64_t red_id, std::string email, float GPA, float units_taken) : name(name), red_id(red_id), email(email), GPA(GPA), units_taken(units_taken)
 	{
 		// Boundary for GPA and units_taken. Neither can be negative. GPA max is 4.0 and units_taken max is 150.
-		if(GPA < 0.0)
-			this->GPA = 0.0;
-		else if(GPA > 4.0)
-			this->GPA = 4.0;
-		if(units_taken < 0)
-			this->units_taken = 0;
-		if(units_taken > 150)
-			this->units_taken = 150;
+		if (GPA < 0.0 || GPA > 4.0)
+		{
+			throw std::invalid_argument("GPA must be between 0.0 and 4.0");
+		}
+		if (units_taken < 0 || units_taken > 150)
+		{
+			throw std::invalid_argument("Units taken must be between 0 and 150");
+		}
 
 	}
 
@@ -60,9 +61,16 @@ public:
 		return GPA;
 	}
 	// Accessor Method for units_taken
-	uint8_t getUnitsTaken(void) const
+	float getUnitsTaken(void) const
 	{
 		return units_taken;
+	}
+
+	float computePriority() const
+	{
+		float normalizedUnits = units_taken / 150.0f;
+		float normalizedGPA   = GPA / 4.0f;
+		return (0.7f * normalizedUnits) + (0.3f * normalizedGPA);
 	}
 
 	// Print out red id and name of student
@@ -76,5 +84,5 @@ private:
 	uint64_t		red_id;
 	std::string		email;
 	float			GPA;
-	int				units_taken;
+	float			units_taken;
 };
