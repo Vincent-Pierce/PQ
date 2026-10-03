@@ -10,32 +10,31 @@
 #include "Student.h"
 #include <vector>
 #include <cstdio>
+#include <memory>
+#include <stdexcept>
+#include <utility>
 
 /* Class defs **********************************************************************************************/
 #include "Queue.h"
+#include "Strategy/Strategy.h"
+#include "Strategy/MaxStrategy.h"
 class PriorityQueue : public Queue<Student>
 {
 public:
-	PriorityQueue() = default;
+	// Default to max-heap
+	PriorityQueue() : PriorityQueue(std::make_shared<MaxStrategy<Student>>())
+	{
+	}
+
+	explicit PriorityQueue(std::shared_ptr<const Strategy<Student>> strategy) : strategy(std::move(strategy))
+	{
+		if (!this->strategy)
+			throw std::invalid_argument("PriorityQueue requires a strategy");
+	}
 
 	~PriorityQueue() = default;
 
-	// Copy Constructor
-	PriorityQueue Copy(PriorityQueue const& other)
-	{
-		pq = other.pq;
-		return *this;
-	}
 
-	// Copy Assignment Operator
-	PriorityQueue& operator=(PriorityQueue const& other)
-	{
-		if (this != &other)
-		{
-			pq = other.pq;
-		}
-		return *this;
-	}
 
 	// Adds student to priority queue. 
 	void enqueue(const Student& student)
@@ -90,98 +89,22 @@ public:
 
     // Print all students in PRIORITY ORDER by draining a copy of the heap
     void print(void) const
-    {
-        if (this->isEmpty())
-            return;
- 
-        // Work on a copy so we don't disturb the real queue
+	{
 		PriorityQueue copy = *this;
-
-        // std::vector<Student> heap = pq;
- 
-        // Heapify (max-heap) from middle down to root
-        for (int i = (copy.size() / 2) - 1; i >= 0; --i)
-        {
-            int index = i;
-            while (true)
-            {
-                int leftIndex  = 2 * index + 1;
-                int rightIndex = 2 * index + 2;
- 
-                if (leftIndex >= (copy.size()))
-                    break;
- 
-                int largestIndex = index;
-                if (leftIndex < (copy.size()) &&
-                    getPriority(copy.pq[leftIndex]) > getPriority(copy.pq[largestIndex]))
-                {
-                    largestIndex = leftIndex;
-                }
-                if (rightIndex < (copy.size()) &&
-                    getPriority(copy.pq[rightIndex]) > getPriority(copy.pq[largestIndex]))
-                {
-                    largestIndex = rightIndex;
-                }
-                if (largestIndex == index)
-                    break;
- 
-                std::swap(copy.pq[index], copy.pq[largestIndex]);
-                index = largestIndex;
-            }
-        }
- 
-        // Repeatedly remove max and print
-        while (!copy.isEmpty())
-        {
-            const Student& front = copy.pq[0];
-            std::printf("Name:\t%s\tRedID:\t%llu\tPriority:\t%f\n",
-                front.getName().c_str(),
-                static_cast<unsigned long long>(front.getRedID()),
-                getPriority(front));
- 
-            copy.pq[0] = copy.pq.back();
-            copy.pq.pop_back();
- 
-            int index = 0;
-            while (true)
-            {
-                int leftIndex  = 2 * index + 1;
-                int rightIndex = 2 * index + 2;
- 
-                if (leftIndex >= (copy.size()))
-                    break;
- 
-                int largestIndex = index;
-                if (leftIndex < (copy.size()) &&
-                    getPriority(copy.pq[leftIndex]) > getPriority(copy.pq[largestIndex]))
-                {
-                    largestIndex = leftIndex;
-                }
-                if (rightIndex < (copy.size()) &&
-                    getPriority(copy.pq[rightIndex]) > getPriority(copy.pq[largestIndex]))
-                {
-                    largestIndex = rightIndex;
-                }
-                if (largestIndex == index)
-                    break;
- 
-                std::swap(copy.pq[index], copy.pq[largestIndex]);
-                index = largestIndex;
-            }
-        }
+		while (!copy.isEmpty())
+		{
+			const Student& student = copy.pq[0];
+			std::printf("Name:\t%s\tRedID:\t%llu\tPriority:\t%f\n",
+				student.getName().c_str(),
+				static_cast<unsigned long long>(student.getRedID()),
+				student.computePriority());
+			copy.dequeue();
+		}
 	}
 
 private:
 	std::vector<Student> pq; // Store students by value 
-
-	// Calculates the priority of a student as 70% units taken and 30% GPA,
-	// normalized so both components are in the range [0,1]
-	static float getPriority(Student student)
-	{
-		float normalizedUnits = student.getUnitsTaken() / 150.0f;
-		float normalizedGPA   = student.getGPA() / 4.0f;
-		return (0.7f * normalizedUnits) + (0.3f * normalizedGPA);
-	}
+	std::shared_ptr<const Strategy<Student>> strategy;
 
 	// Finds the correct index for a given node within pq after insertion to back
 	void bubbleUp(int index)
@@ -189,7 +112,7 @@ private:
 		while(index > 0)
 		{
 			int parentIndex = (index - 1) / 2;
-			if(getPriority(pq[index]) > getPriority(pq[parentIndex]))
+			if(strategy->higherPriority(pq[index], pq[parentIndex]))
 			{
 				// Swap
 				Student temp = pq[index];
@@ -221,30 +144,30 @@ private:
 			if (leftIndex >= pq.size())
 				break; // no children
 
-			int largestIndex = index;
+			int highestPriorityIndex = index;
 
-			if (leftIndex < pq.size() && getPriority(pq[leftIndex]) > getPriority(pq[largestIndex]))
+			if (leftIndex < pq.size() && strategy->higherPriority(pq[leftIndex], pq[highestPriorityIndex]))
 			{
-				largestIndex = leftIndex;
+				highestPriorityIndex = leftIndex;
 			}
 
 			if (rightIndex < pq.size())
 			{
-				if (getPriority(pq[rightIndex]) > getPriority(pq[largestIndex]))
+				if (strategy->higherPriority(pq[rightIndex], pq[highestPriorityIndex]))
 				{
-					largestIndex = rightIndex;
+					highestPriorityIndex = rightIndex;
 				}
 			}
 
-			if (largestIndex == index)
+			if (highestPriorityIndex == index)
 				break;
 			
 			// Swap
 			Student temp = pq[index];
-			pq[index] = pq[largestIndex];
-			pq[largestIndex] = temp;
+			pq[index] = pq[highestPriorityIndex];
+			pq[highestPriorityIndex] = temp;
 
-			index = largestIndex;
+			index = highestPriorityIndex;
 		}
 	}
 };

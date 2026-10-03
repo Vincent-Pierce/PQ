@@ -37,6 +37,12 @@ public:
 
 	}
 
+	// Overloaded operator for comparing two students based on their computed priority.
+	bool operator>(const Student& other) const
+	{
+		return computePriority() > other.computePriority();
+	}
+
 	// Accessor Method for name
 	std::string getName(void) const
 	{
