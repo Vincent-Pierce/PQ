@@ -27,7 +27,7 @@ public:
 		bubbleUp(index);
 	}
 
-	const Student* peek(void) const
+	const Student* top(void) const
 	{
 		if(pq.empty())
 			return nullptr;

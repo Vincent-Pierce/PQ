@@ -12,11 +12,11 @@ int main(int argc, char* argv[])
 	pq.insert(s2);
 	pq.insert(s3);
 
-	pq.peek();
+	pq.top();
 	pq.pop();
-	pq.peek();
+	pq.top();
 	pq.pop();
-	pq.peek();
+	pq.top();
 	printf("done\n");
 
 	return 0;

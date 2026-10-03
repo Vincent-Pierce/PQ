@@ -21,13 +21,13 @@ TEST(Student, ConstructorExceedingValues)
     EXPECT_THROW({ Student s1("Amy", 0, "amy@gmail.com", 5.0f, 151); }, std::invalid_argument);
 }
 
-TEST(PriorityQueue, peek)
+TEST(PriorityQueue, top)
 {
     Student s1 = Student("Amy", 0, "amy@gmail.com", 4.0, 10);
     PriorityQueue pq = PriorityQueue();
     pq.insert(s1);
 
-    EXPECT_EQ(pq.peek()->getName(), "Amy");
+    EXPECT_EQ(pq.top()->getName(), "Amy");
 }
 
 TEST(PriorityQueue, insert)
@@ -41,7 +41,7 @@ TEST(PriorityQueue, insert)
     pq.insert(s2);
     pq.insert(s3);
 
-    EXPECT_EQ(pq.peek()->getName(), "Charlie");
+    EXPECT_EQ(pq.top()->getName(), "Charlie");
 }
 
 TEST(PriorityQueue, pop_one)
@@ -52,7 +52,7 @@ TEST(PriorityQueue, pop_one)
 
     
     EXPECT_EQ(pq.pop(), true);
-    EXPECT_EQ(pq.peek(), nullptr);
+    EXPECT_EQ(pq.top(), nullptr);
 }
 
 TEST(PriorityQueue, print)
@@ -84,15 +84,15 @@ TEST(PriorityQueue, tie_breaker)
     pq.insert(s3);
     pq.insert(s4);
 
-    EXPECT_EQ(pq.peek()->getName(), "Charlie"); 
+    EXPECT_EQ(pq.top()->getName(), "Charlie"); 
     EXPECT_EQ(pq.pop(), true);
-    EXPECT_EQ(pq.peek()->getName(), "David"); 
+    EXPECT_EQ(pq.top()->getName(), "David"); 
     EXPECT_EQ(pq.pop(), true);
-    EXPECT_EQ(pq.peek()->getName(), "Amy"); 
+    EXPECT_EQ(pq.top()->getName(), "Amy"); 
     EXPECT_EQ(pq.pop(), true);
-    EXPECT_EQ(pq.peek()->getName(), "Bob"); 
+    EXPECT_EQ(pq.top()->getName(), "Bob"); 
     EXPECT_EQ(pq.pop(), true);
-    EXPECT_EQ(pq.peek(), nullptr);
+    EXPECT_EQ(pq.top(), nullptr);
 }
 
 TEST(PriorityQueue, pop_empty)
@@ -101,10 +101,10 @@ TEST(PriorityQueue, pop_empty)
     EXPECT_EQ(pq.pop(), false);
 }
 
-TEST(PriorityQueue, peek_empty)
+TEST(PriorityQueue, top_empty)
 {
     PriorityQueue pq = PriorityQueue();
-    EXPECT_EQ(pq.peek(), nullptr);
+    EXPECT_EQ(pq.top(), nullptr);
 }
 
 TEST(PriorityQueue, StressTest)
@@ -118,10 +118,10 @@ TEST(PriorityQueue, StressTest)
     }
 
     // Drain the priority queue and verify order
-    Student const* current = pq.peek();
+    Student const* current = pq.top();
     while((pq.pop()))
     {
-        Student const* next = pq.peek();
+        Student const* next = pq.top();
         if (next)
         {
             EXPECT_GE(current->computePriority(), next->computePriority());
