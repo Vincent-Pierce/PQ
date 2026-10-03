@@ -20,6 +20,23 @@ public:
 
 	~PriorityQueue() = default;
 
+	// Copy Constructor
+	PriorityQueue Copy(PriorityQueue const& other)
+	{
+		pq = other.pq;
+		return *this;
+	}
+
+	// Copy Assignment Operator
+	PriorityQueue& operator=(PriorityQueue const& other)
+	{
+		if (this != &other)
+		{
+			pq = other.pq;
+		}
+		return *this;
+	}
+
 	// Adds student to priority queue. 
 	void enqueue(const Student& student)
 	{
@@ -74,14 +91,16 @@ public:
     // Print all students in PRIORITY ORDER by draining a copy of the heap
     void print(void) const
     {
-        if (pq.empty())
+        if (this->isEmpty())
             return;
  
         // Work on a copy so we don't disturb the real queue
-        std::vector<Student> heap = pq;
+		PriorityQueue copy = *this;
+
+        // std::vector<Student> heap = pq;
  
         // Heapify (max-heap) from middle down to root
-        for (int i = (heap.size() / 2) - 1; i >= 0; --i)
+        for (int i = (copy.size() / 2) - 1; i >= 0; --i)
         {
             int index = i;
             while (true)
@@ -89,39 +108,39 @@ public:
                 int leftIndex  = 2 * index + 1;
                 int rightIndex = 2 * index + 2;
  
-                if (leftIndex >= (heap.size()))
+                if (leftIndex >= (copy.size()))
                     break;
  
                 int largestIndex = index;
-                if (leftIndex < (heap.size()) &&
-                    getPriority(heap[leftIndex]) > getPriority(heap[largestIndex]))
+                if (leftIndex < (copy.size()) &&
+                    getPriority(copy.pq[leftIndex]) > getPriority(copy.pq[largestIndex]))
                 {
                     largestIndex = leftIndex;
                 }
-                if (rightIndex < (heap.size()) &&
-                    getPriority(heap[rightIndex]) > getPriority(heap[largestIndex]))
+                if (rightIndex < (copy.size()) &&
+                    getPriority(copy.pq[rightIndex]) > getPriority(copy.pq[largestIndex]))
                 {
                     largestIndex = rightIndex;
                 }
                 if (largestIndex == index)
                     break;
  
-                std::swap(heap[index], heap[largestIndex]);
+                std::swap(copy.pq[index], copy.pq[largestIndex]);
                 index = largestIndex;
             }
         }
  
         // Repeatedly remove max and print
-        while (!heap.empty())
+        while (!copy.isEmpty())
         {
-            const Student& front = heap[0];
+            const Student& front = copy.pq[0];
             std::printf("Name:\t%s\tRedID:\t%llu\tPriority:\t%f\n",
                 front.getName().c_str(),
                 static_cast<unsigned long long>(front.getRedID()),
                 getPriority(front));
  
-            heap[0] = heap.back();
-            heap.pop_back();
+            copy.pq[0] = copy.pq.back();
+            copy.pq.pop_back();
  
             int index = 0;
             while (true)
@@ -129,24 +148,24 @@ public:
                 int leftIndex  = 2 * index + 1;
                 int rightIndex = 2 * index + 2;
  
-                if (leftIndex >= (heap.size()))
+                if (leftIndex >= (copy.size()))
                     break;
  
                 int largestIndex = index;
-                if (leftIndex < (heap.size()) &&
-                    getPriority(heap[leftIndex]) > getPriority(heap[largestIndex]))
+                if (leftIndex < (copy.size()) &&
+                    getPriority(copy.pq[leftIndex]) > getPriority(copy.pq[largestIndex]))
                 {
                     largestIndex = leftIndex;
                 }
-                if (rightIndex < (heap.size()) &&
-                    getPriority(heap[rightIndex]) > getPriority(heap[largestIndex]))
+                if (rightIndex < (copy.size()) &&
+                    getPriority(copy.pq[rightIndex]) > getPriority(copy.pq[largestIndex]))
                 {
                     largestIndex = rightIndex;
                 }
                 if (largestIndex == index)
                     break;
  
-                std::swap(heap[index], heap[largestIndex]);
+                std::swap(copy.pq[index], copy.pq[largestIndex]);
                 index = largestIndex;
             }
         }
