@@ -36,6 +36,15 @@ public:
 		}
 
 	}
+	// Overloaded operator for deep comparison
+	bool operator==(const Student& other) const
+	{
+		return name == other.name
+			&& red_id == other.red_id
+			&& email == other.email
+			&& GPA == other.GPA
+			&& units_taken == other.units_taken;
+	}
 
 	// Overloaded operator for comparing two students based on their computed priority.
 	bool operator>(const Student& other) const

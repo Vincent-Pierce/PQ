@@ -1,5 +1,7 @@
 #include <gtest/gtest.h>
 #include <memory>
+#include "Command/EnqueueCommand.h"
+#include "Command/DequeueCommand.h"
 #include "Priority Queue.h"
 #include "Strategy/MinStrategy.h"
 
@@ -30,6 +32,53 @@ TEST(PriorityQueue, front)
     pq.enqueue(s1);
 
     EXPECT_EQ(pq.front()->getName(), "Amy");
+}
+
+TEST(EnqueueCommand, undoRemovesEnqueuedStudentWithoutRemovingFront)
+{
+    PriorityQueue pq;
+    Student highPriority("Charlie", 1, "charlie@gmail.com", 4.0f, 100.0f);
+    Student lowPriority("Bob", 2, "bob@gmail.com", 3.0f, 0.0f);
+    pq.enqueue(highPriority);
+
+    EnqueueCommand command(pq, lowPriority);
+    command.execute();
+    ASSERT_EQ(pq.size(), 2);
+    ASSERT_NE(pq.front(), nullptr);
+    EXPECT_EQ(pq.front()->getName(), "Charlie");
+
+    command.undo();
+
+    ASSERT_EQ(pq.size(), 1);
+    ASSERT_NE(pq.front(), nullptr);
+    EXPECT_EQ(pq.front()->getName(), "Charlie");
+}
+
+TEST(PriorityQueue, removeRestoresHeapAfterRemovingNonRootStudent)
+{
+    PriorityQueue pq;
+    Student root("Root", 1, "root@example.com", 0.0f, 150.0f);
+    Student left("Left", 2, "left@example.com", 0.0f, 75.0f);
+    Student right("Right", 3, "right@example.com", 0.0f, 135.0f);
+    Student removed("Removed", 4, "removed@example.com", 0.0f, 30.0f);
+    Student last("Last", 5, "last@example.com", 0.0f, 127.5f);
+    Student nextRight("NextRight", 6, "next-right@example.com", 0.0f, 120.0f);
+    Student lastRight("LastRight", 7, "last-right@example.com", 0.0f, 130.0f);
+
+    for (const Student& student : {root, left, right, removed, last, nextRight, lastRight})
+        pq.enqueue(student);
+
+    ASSERT_TRUE(pq.remove(removed));
+    EXPECT_FALSE(pq.remove(removed));
+
+    const uint64_t expectedOrder[] = {1, 3, 7, 5, 6, 2};
+    for (uint64_t redId : expectedOrder)
+    {
+        ASSERT_NE(pq.front(), nullptr);
+        EXPECT_EQ(pq.front()->getRedID(), redId);
+        EXPECT_TRUE(pq.dequeue());
+    }
+    EXPECT_TRUE(pq.isEmpty());
 }
 
 TEST(PriorityQueue, enqueue)
@@ -76,7 +125,7 @@ TEST(PriorityQueue, min_strategy_enqueue_and_dequeue)
     EXPECT_EQ(minQueue.front()->getName(), "Charlie");
 }
 
-TEST(PriorityQueue, dequeue_one)
+TEST(PriorityQueue, dequeue)
 {
     Student s1       = Student("Amy", 0, "amy@gmail.com", 4.0, 10);
     PriorityQueue pq = PriorityQueue();
@@ -183,4 +232,59 @@ TEST(PriorityQueue, StressTest)
         }
         current = next;
     }
+}
+
+TEST(PriorityQueue, EnqueueCommand)
+{
+    // Max strategy means highest priority element is at the front
+    PriorityQueue pq = PriorityQueue(); 
+    Student s1  = Student("Amy", 0, "amy@gmail.com", 4.0, 10);
+	Student s2  = Student("Bob", 0, "bob@gmail.com", 3.0, 0);
+	Student s3  = Student("Charlie", 0, "charlie@gmail.com", 4.0, 100); //highest prio
+    Student s4  = Student("David", 0, "david@gmail.com", 4.0, 150); //same prio as Charlie
+    EnqueueCommand cmd1(pq, s2);
+    EnqueueCommand cmd2(pq, s1);
+    EnqueueCommand cmd3(pq, s3);
+    EnqueueCommand cmd4(pq, s4);
+
+    cmd1.execute();
+    EXPECT_EQ(pq.front()->getName(), "Bob"); 
+    cmd2.execute();
+    EXPECT_EQ(pq.front()->getName(), "Amy"); 
+    cmd3.execute();
+    EXPECT_EQ(pq.front()->getName(), "Charlie"); 
+    cmd4.execute();
+    EXPECT_EQ(pq.front()->getName(), "David"); 
+    cmd4.undo();
+    EXPECT_EQ(pq.front()->getName(), "Charlie"); 
+    cmd3.undo();
+    EXPECT_EQ(pq.front()->getName(), "Amy"); 
+    cmd2.undo();
+    EXPECT_EQ(pq.front()->getName(), "Bob"); 
+    cmd1.undo();
+    EXPECT_EQ(pq.front(), nullptr);
+}
+
+TEST(PriorityQueue, DequeueCommand)
+{
+    PriorityQueue pq = PriorityQueue();
+    DequeueCommand cmd1(pq);
+    DequeueCommand cmd2(pq);
+    DequeueCommand cmd3(pq);
+    DequeueCommand cmd4(pq);
+    Student s1 = Student("Test", 0, "test@gmail.com", 4.0, 100);
+    Student s2 = Student("Test", 0, "test@gmail.com", 4.0, 100);
+    Student s3 = Student("Test", 0, "test@gmail.com", 4.0, 100);
+    Student s4 = Student("Test", 0, "test@gmail.com", 4.0, 100);
+    EXPECT_EQ(cmd1.execute(), false);
+    pq.enqueue(s1);
+    pq.enqueue(s2);
+    pq.enqueue(s3);
+    pq.enqueue(s4);
+    EXPECT_EQ(cmd1.execute(), true);
+    EXPECT_EQ(cmd1.execute(), false);
+    EXPECT_EQ(cmd2.execute(), true);
+    EXPECT_EQ(cmd3.execute(), true);
+    EXPECT_EQ(cmd4.execute(), true);
+    EXPECT_EQ(cmd4.execute(), false);
 }

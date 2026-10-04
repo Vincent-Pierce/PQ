@@ -8,6 +8,7 @@
 
 /* Standard Libs *******************************************************************************************/
 #include "Student.h"
+#include <algorithm>
 #include <vector>
 #include <cstdio>
 #include <memory>
@@ -50,7 +51,7 @@ public:
 		if (!pq.size())
 			return false;
 
-		bubbleDown();
+		removeAt(0);
 
 		return true;
 	}
@@ -62,6 +63,17 @@ public:
 			return nullptr;
 		else
 			return &pq[0];
+	}
+
+	// Removes the first matching student and restores the heap property.
+	bool remove(const Student& student)
+	{
+		auto found = std::find(pq.begin(), pq.end(), student);
+		if (found == pq.end())
+			return false;
+
+		removeAt(static_cast<int>(found - pq.begin()));
+		return true;
 	}
 
 	bool isEmpty(void) const override 
@@ -106,6 +118,21 @@ private:
 	std::vector<Student> pq; // Store students by value 
 	std::shared_ptr<const Strategy<Student>> strategy;
 
+	void removeAt(int index)
+	{
+		if (index != static_cast<int>(pq.size()) - 1)
+			pq[index] = std::move(pq.back());
+		pq.pop_back();
+
+		if (index >= static_cast<int>(pq.size()))
+			return;
+
+		if (index > 0 && strategy->higherPriority(pq[index], pq[(index - 1) / 2]))
+			bubbleUp(index);
+		else
+			bubbleDown(index);
+	}
+
 	// Finds the correct index for a given node within pq after insertion to back
 	void bubbleUp(int index)
 	{
@@ -126,16 +153,9 @@ private:
 		}
 	}
 
-	// Restores the heap property after removing the root element
-	void bubbleDown()
+	// Restores the heap property from the given node toward the leaves.
+	void bubbleDown(int index)
 	{
-		// Move last element to front
-		pq[0] = pq[pq.size() - 1];
-		pq.pop_back();
-		if (pq.size() == 0)
-			return;
-
-		int index = 0;
 		while (true)
 		{
 			int leftIndex  = (index * 2) + 1;
