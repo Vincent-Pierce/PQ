@@ -52,6 +52,18 @@ public:
 		return computePriority() > other.computePriority();
 	}
 
+	void operator=(const Student& other)
+	{
+		if (this != &other)
+		{
+			name = other.name;
+			red_id = other.red_id;
+			email = other.email;
+			GPA = other.GPA;
+			units_taken = other.units_taken;
+		}
+	}
+
 	// Accessor Method for name
 	std::string getName(void) const
 	{

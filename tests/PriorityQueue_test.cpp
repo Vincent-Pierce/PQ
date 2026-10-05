@@ -4,6 +4,7 @@
 #include "Command/DequeueCommand.h"
 #include "Priority Queue.h"
 #include "Strategy/MinStrategy.h"
+#include "Iterator/PriorityQueueIterator.h"
 
 TEST(Student, Constructor)
 {
@@ -32,6 +33,28 @@ TEST(PriorityQueue, front)
     pq.enqueue(s1);
 
     EXPECT_EQ(pq.front()->getName(), "Amy");
+}
+
+TEST(PriorityQueue, toArray)
+{
+    Student s1 = Student("Amy", 0, "amy@gmail.com", 4.0, 10);
+    Student s2 = Student("Bob", 0, "bob@gmail.com", 3.0, 0);
+    PriorityQueue pq = PriorityQueue();
+    pq.enqueue(s1);
+    pq.enqueue(s2);
+
+    EXPECT_THROW(pq.toArray(), std::logic_error);
+}
+
+TEST(PriorityQueue, toString)
+{
+    Student s1 = Student("Amy", 0, "amy@gmail.com", 4.0, 10);
+    Student s2 = Student("Bob", 0, "bob@gmail.com", 3.0, 0);
+    PriorityQueue pq = PriorityQueue();
+    pq.enqueue(s1);
+    pq.enqueue(s2);
+
+    EXPECT_THROW(pq.toString(), std::logic_error);
 }
 
 TEST(EnqueueCommand, undoRemovesEnqueuedStudentWithoutRemovingFront)
@@ -287,4 +310,104 @@ TEST(PriorityQueue, DequeueCommand)
     EXPECT_EQ(cmd3.execute(), true);
     EXPECT_EQ(cmd4.execute(), true);
     EXPECT_EQ(cmd4.execute(), false);
+}
+
+TEST(PriorityQueue, DequeueCommandUndoRestoresRemovedStudentsInOrder)
+{
+    PriorityQueue pq;
+    Student lowPriority("Low", 1, "low@example.com", 3.0f, 0.0f);
+    Student middlePriority("Middle", 2, "middle@example.com", 3.5f, 50.0f);
+    Student highPriority("High", 3, "high@example.com", 4.0f, 100.0f);
+    pq.enqueue(lowPriority);
+    pq.enqueue(middlePriority);
+    pq.enqueue(highPriority);
+
+    DequeueCommand first(pq);
+    DequeueCommand second(pq);
+
+    ASSERT_TRUE(first.execute());
+    ASSERT_NE(pq.front(), nullptr);
+    EXPECT_EQ(pq.front()->getRedID(), middlePriority.getRedID());
+    ASSERT_TRUE(second.execute());
+    ASSERT_NE(pq.front(), nullptr);
+    EXPECT_EQ(pq.front()->getRedID(), lowPriority.getRedID());
+    EXPECT_FALSE(second.execute());
+
+    EXPECT_TRUE(second.undo());
+    ASSERT_NE(pq.front(), nullptr);
+    EXPECT_EQ(pq.front()->getRedID(), middlePriority.getRedID());
+    EXPECT_FALSE(second.undo());
+    EXPECT_TRUE(first.undo());
+    ASSERT_NE(pq.front(), nullptr);
+    EXPECT_EQ(pq.front()->getRedID(), highPriority.getRedID());
+    EXPECT_EQ(pq.size(), 3);
+    EXPECT_FALSE(first.undo());
+}
+
+TEST(PriorityQueue, PriorityQueueIteratorTest)
+{
+    PriorityQueue pq;
+    Student lowPriority("Bob", 1, "bob@example.com", 3.0f, 0.0f);
+    Student middlePriority("Amy", 2, "amy@example.com", 4.0f, 10.0f);
+    Student highPriority("Charlie", 3, "charlie@example.com", 4.0f, 100.0f);
+    pq.enqueue(lowPriority);
+    pq.enqueue(middlePriority);
+    pq.enqueue(highPriority);
+
+    PriorityQueueIterator it(pq);
+    const Student* current = it.first();
+    ASSERT_NE(current, nullptr);
+    EXPECT_EQ(current->getRedID(), highPriority.getRedID());
+    EXPECT_EQ(it.current()->getRedID(), highPriority.getRedID());
+
+    current = it.next();
+    ASSERT_NE(current, nullptr);
+    EXPECT_EQ(current->getRedID(), middlePriority.getRedID());
+    current = it.next();
+    ASSERT_NE(current, nullptr);
+    EXPECT_EQ(current->getRedID(), lowPriority.getRedID());
+    EXPECT_EQ(it.next(), nullptr);
+
+    ASSERT_NE(pq.front(), nullptr);
+    EXPECT_EQ(pq.size(), 3);
+    EXPECT_EQ(pq.front()->getRedID(), highPriority.getRedID());
+}
+
+TEST(PriorityQueue, PriorityQueueIteratorEmptyTest)
+{
+    PriorityQueue pq;
+    PriorityQueueIterator it(pq);
+    EXPECT_EQ(it.first(), nullptr);
+    EXPECT_EQ(it.current(), nullptr);
+    EXPECT_EQ(it.next(), nullptr);
+}
+
+TEST(PriorityQueue, PriorityQueueIteratorIncrementTest)
+{
+    auto minStrategy = std::make_shared<MinStrategy<Student>>();
+    PriorityQueue pq(minStrategy);
+    Student highPriority("Charlie", 1, "charlie@example.com", 4.0f, 100.0f);
+    Student lowPriority("Bob", 2, "bob@example.com", 3.0f, 0.0f);
+    Student middlePriority("Amy", 3, "amy@example.com", 4.0f, 10.0f);
+    pq.enqueue(highPriority);
+    pq.enqueue(lowPriority);
+    pq.enqueue(middlePriority);
+
+    PriorityQueueIterator iterator(pq);
+    const uint64_t expectedOrder[] = {
+        lowPriority.getRedID(),
+        middlePriority.getRedID(),
+        highPriority.getRedID()
+    };
+    int index = 0;
+
+    for (auto it = iterator; it != nullptr; it++)
+    {
+        ASSERT_LT(index, 3);
+        ASSERT_NE(it.current(), nullptr);
+        EXPECT_EQ(it.current()->getRedID(), expectedOrder[index]);
+        ++index;
+    }
+
+    EXPECT_EQ(index, 3);
 }
